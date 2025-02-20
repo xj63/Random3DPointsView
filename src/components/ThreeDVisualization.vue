@@ -6,12 +6,7 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-
-// 定义点云数据接口
-interface PointData {
-  position: [number, number, number] // [x, y, z]
-  color: [number, number, number] // [r, g, b] 范围 0-1
-}
+import type { PointData } from '@/types/PointData'
 
 // 定义props
 interface Props {
