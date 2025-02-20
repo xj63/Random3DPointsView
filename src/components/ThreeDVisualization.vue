@@ -7,6 +7,12 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
+// 定义点云数据接口
+interface PointData {
+  position: [number, number, number] // [x, y, z]
+  color: [number, number, number] // [r, g, b] 范围 0-1
+}
+
 // 定义props
 interface Props {
   blob: Blob
@@ -57,32 +63,36 @@ const createPointCloud = async () => {
   try {
     // 从blob中读取点云数据
     const data = await props.blob.text()
-    const pointsData = JSON.parse(data) // 假设数据格式为 [[x1,y1,z1], [x2,y2,z2], ...]
+    const pointsData: PointData[] = JSON.parse(data)
 
     // 创建顶点几何体
     const geometry = new THREE.BufferGeometry()
 
-    // 将点数据转换为Float32Array
-    const positions = new Float32Array(pointsData.flat())
-
-    // 设置位置属性
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
-
-    // 为每个点创建颜色
+    // 创建位置数组
+    const positions = new Float32Array(pointsData.length * 3)
     const colors = new Float32Array(pointsData.length * 3)
-    for (let i = 0; i < pointsData.length; i++) {
-      // 这里可以根据点的位置或其他属性设置不同的颜色
-      colors[i * 3] = 0.5 // R
-      colors[i * 3 + 1] = 0.8 // G
-      colors[i * 3 + 2] = 1.0 // B
-    }
+
+    pointsData.forEach((point, index) => {
+      // 设置位置
+      positions[index * 3] = point.position[0] // x
+      positions[index * 3 + 1] = point.position[1] // y
+      positions[index * 3 + 2] = point.position[2] // z
+
+      // 设置颜色
+      colors[index * 3] = point.color[0] // r
+      colors[index * 3 + 1] = point.color[1] // g
+      colors[index * 3 + 2] = point.color[2] // b
+    })
+
+    // 设置位置和颜色属性
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
 
     // 创建点材质
     const material = new THREE.PointsMaterial({
-      size: 0.05, // 点的大小
-      vertexColors: true, // 使用顶点颜色
-      sizeAttenuation: true, // 近大远小
+      size: 0.05,
+      vertexColors: true, // 启用顶点颜色
+      sizeAttenuation: true, // 启用距离衰减
       transparent: true,
       opacity: 0.8,
     })
