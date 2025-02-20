@@ -39,7 +39,7 @@ jobs:
 
       - name: Fetch gh-pages branch
         run: |
-          git fetch origin gh-pages
+          git fetch origin gh-pages || exit 0
           git checkout origin/gh-pages || echo "gh-pages branch does not exist yet"
         shell: bash
 
