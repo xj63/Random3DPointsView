@@ -7,5 +7,13 @@
     {
       "path": "./tsconfig.app.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "allowJs": true,
+    "types": ["three"],
+    "paths": {
+      "three/examples/jsm/*": ["./node_modules/three/examples/jsm/*"]
+    }
+  }
 }
