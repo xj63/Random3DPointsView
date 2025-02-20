@@ -6,27 +6,34 @@
 
 <script setup lang="ts">
 import ThreeDVisualization from '@/components/ThreeDVisualization.vue'
+import type { PointData } from './types/PointData'
 import { ref } from 'vue'
+import { colorMaps } from './utils/colorUtils'
 
 // 生成示例点云数据
-const generatePointCloudData = (numPoints: number = 1000) => {
-  const points = []
-  for (let i = 0; i < numPoints; i++) {
-    // 生成随机位置
-    const x = (Math.random() - 0.5) * 10
-    const y = (Math.random() - 0.5) * 10
-    const z = (Math.random() - 0.5) * 10
+const generatePointCloudData = (numPoints: number = 1000): PointData[] => {
+  const points: PointData[] = []
 
-    // 根据位置生成颜色（这只是一个示例，你可以使用任何颜色映射方案）
-    const r = Math.abs(x / 10) // 根据x位置决定红色分量
-    const g = Math.abs(y / 10) // 根据y位置决定绿色分量
-    const b = Math.abs(z / 10) // 根据z位置决定蓝色分量
-
-    points.push({
-      position: [x, y, z],
-      color: [r, g, b],
+  // 生成随机位置
+  const positions = Array(numPoints)
+    .fill(0)
+    .map(() => {
+      const pos = [
+        (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 10,
+      ]
+      return pos
     })
-  }
+
+  // 使用高度映射生成颜色
+  positions.forEach((pos) => {
+    points.push({
+      position: pos as [number, number, number],
+      color: colorMaps.heightColor(pos[1], -8, 8),
+    })
+  })
+
   return points
 }
 
